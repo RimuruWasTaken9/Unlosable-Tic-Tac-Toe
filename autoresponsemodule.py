@@ -1,13 +1,10 @@
 import random
-import logging
 import otherfunctionsmodule
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s \
-- %(levelname)s - %(message)s')
-logging.disable(logging.CRITICAL)
+
 spotcheck = ['ignore', 'top-L', 'top-M', 'top-R', 'mid-L', 'mid-M', 'mid-R', 'low-L', 'low-M', 'low-R']
+#this is the brain of the computer. It checks for a possible win, possible loss
 def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
     global spotcheck
-    logging.debug('beginning autoresponse, route is %s' % route)
 
     #if the bot ever has a chance to win on its next move, it will take it
     block,isitover = otherfunctionsmodule.ifwinpossible3(notPlayer,player,theBoard,block)
@@ -58,13 +55,13 @@ def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
                 block = botplace(notPlayer, theBoard, block,  [relative['adj.cor.1'],relative['adj.cor.2']])
 
             route = 't2-nmr'
-            logging.debug('end of t3 nmr, route is %s' % route)
 
         #turn 3 middle response(bot went first)
         elif count == 3 and theBoard[spotcheck[5]] == player:
             block = botplace(notPlayer,theBoard,block,[relative['opp.cor.']])
             route = 't2-mr'
 
+        #turn 4 corner response(player went first)
         elif count == 4 and route == 't1-cr':
             if spotcheck[relative['opp.cor.']] in block:
                 block = botplace(notPlayer, theBoard, block, [relative['adj.neigh.1'],relative['adj.neigh.2'],relative['knight.1'],relative['knight.2']])
@@ -78,11 +75,13 @@ def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
                 if block[4] == spotcheck[relative['adj.neigh.2']]:
                     route = 't1-cr-more'
 
+        #turn 4 middle response(player went first)
         elif count == 4 and route == 't1-mr':
             relative = detectrelativepos(spotcheck.index(block[2]))
             if spotcheck[relative['opp.cor.']] in block:
                 block = botplace(notPlayer, theBoard, block, [relative['adj.cor.1'], relative['adj.cor.2']])
 
+        #turn 4 side response(player went first)
         elif count == 4 and route == 't1-sr-mr':
             if spotcheck[relative['knight.cor.1']] in block:
                 block = botplace(notPlayer, theBoard, block, [relative['adj.cor.1'], relative['adj.cor.2'],relative['diag.neigh.1'],relative['diag.neigh.2']])
@@ -99,6 +98,7 @@ def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
             else:
                 block = otherfunctionsmodule.ifdoesnotmatter(notPlayer, player, theBoard, block, relative)
 
+        #turn 4 opposite side response(player went first)
         elif count == 4 and route == 't1-sr-osr':
             if spotcheck[relative['mid']] in block:
                 block = botplace(notPlayer, theBoard, block, [relative['adj.cor.1'],relative['adj.cor.2'],relative['knight.cor.1'],relative['knight.cor.2']])
@@ -112,6 +112,7 @@ def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
             else:
                 block = otherfunctionsmodule.ifdoesnotmatter(notPlayer, player, theBoard, block, relative)
 
+        #very niche play to prevent getting double trapped and optimize win chance
         elif count == 4 and route == 't1-sr-acr-ac1':
             if spotcheck[relative['knight.cor.1']] in block:
                 block = botplace(notPlayer, theBoard, block, [relative['mid'], relative['opp.side.']])
@@ -196,6 +197,7 @@ def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
             else:
                 block = botplace(notPlayer,theBoard,block,[relative['adj.cor.1'],relative['adj.cor.2']])
                 route = 't2-nmr-ate'
+        #turn 6 niche code to optimize the win chance for the bot       
         elif count == 6 and route == 't1-cr-more':
             block = botplace(notPlayer, theBoard, block, [relative['opp.cor.']])
 
@@ -256,16 +258,17 @@ def autoresponse(theBoard,notPlayer,player,count,block,route,relative):
         elif count == 6 and route == 't1-sr-acr-ac2-kcc':
             block = botplace(notPlayer, theBoard, block, [relative['knight.cor.2']])
 
+        #if the bot doesn't know where to go or it doesn't matter where he goes, he just picks at random
         else:
             block = otherfunctionsmodule.ifdoesnotmatter(notPlayer,player,theBoard,block,relative)
 
 
         count += 1
-        #pprint.pprint(theBoard)
+
         return count,block,route,relative
 
 
-
+#the bot actually putting their move on the board
 def botplace(notPlayer,theBoard,block, keypad):
     global spotcheck
     breakout = 1
@@ -281,7 +284,8 @@ def botplace(notPlayer,theBoard,block, keypad):
     block.append(spotcheck[choice])
     return block
 
-
+#since a tictactoe board is symmetrical both horizontally and vertically, this function essentially
+#makes the way I chose to code the computer 4x shorter code length wise.
 def detectrelativepos(observedtile):
     dict1 = {'start':observedtile,'adj.neigh.1':2,'adj.neigh.2':4,'adj.cor.1':3,'adj.cor.2':7,'knight.1':6,'knight.2':8,'opp.cor.':9,'mid':5}
     dict3 = {'start':observedtile,'adj.neigh.1':6,'adj.neigh.2':2,'adj.cor.1':9,'adj.cor.2':1,'knight.1':8,'knight.2':4,'opp.cor.':7,'mid':5}

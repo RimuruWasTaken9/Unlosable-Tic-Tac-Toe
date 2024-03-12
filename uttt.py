@@ -1,13 +1,10 @@
 #! python3
 import random
-import logging
 import autoresponsemodule
 import otherfunctionsmodule
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s \
-- %(levelname)s - %(message)s')
-logging.disable(logging.CRITICAL)
+
 spotcheck = ['ignore', 'top-L', 'top-M', 'top-R', 'mid-L', 'mid-M', 'mid-R', 'low-L', 'low-M', 'low-R']
-def main():
+if __name__ == "__main__":
     player, notPlayer = otherfunctionsmodule.pickXorO()
     loopControl = 'yes'
     while loopControl != 'no':
@@ -27,7 +24,6 @@ def main():
         otherfunctionsmodule.helpfulboard()
         while True:
 
-            logging.debug('beginning of while loop, count is %s' % (count))
             status = otherfunctionsmodule.windetector(theBoard,player,notPlayer)
             if status == 1:
                 print("\n\nTIC-TAC-TOE, game over.\n")
@@ -59,7 +55,6 @@ def main():
                     print("Please type a valid response")
                     continue
             else:
-                logging.debug('bot about to choose, block is %s' % (block))
                 count,block, route,relative = autoresponsemodule.autoresponse(theBoard,notPlayer,player,count,block,route,relative)
                 otherfunctionsmodule.board(theBoard)
 
@@ -68,7 +63,4 @@ def main():
         otherfunctionsmodule.board(theBoard)
         loopControl = input('\n Play again? (type no to stop): ')
 
-
-
-main()
 

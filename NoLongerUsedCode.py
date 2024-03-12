@@ -1,3 +1,4 @@
+#so much wasted time
 '''
 #original code for turn 3 middle response(bot went first)(bot goes in opposite corner from first move)
 
